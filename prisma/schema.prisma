@@ -1,0 +1,189 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  // output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                   Int      @id @default(autoincrement())
+  fullname             String
+  username             String   @unique
+  bio                  String?
+  profile_image_url    String?
+  phone                String?  @unique
+  email                String   @unique
+  hashed_password      String
+  hashed_refresh_token String?
+  is_active            Boolean? @default(false)
+  activation_link      String?  @unique @default(uuid())
+
+  // posts        Post[]
+  // videos       Video[]
+  // comments     Comment[]
+  // likes        Like[]
+  // watchHistory Watch_History[]
+  // savedVideos  Saved_Video[]
+  // playlists    Playlist[]
+  // notifications Notification[] @relation("ToUser")
+  // notificationsSent Notification[] @relation("FromUser")
+  // followers    Follower[]      @relation("Following")
+  // following    Follower[]      @relation("Follower")
+  // reports      Report[]        @relation("ReportedBy")
+  // bans         Banned_User[]   @relation("BannedBy")
+  // contents     Content[]
+
+  @@map("users")
+}
+
+model Admin {
+  id                   Int     @id @default(autoincrement())
+  fullname             String
+  username             String  @unique
+  profile_image_url    String?
+  phone                String? @unique
+  email                String  @unique
+  hashed_password      String
+  hashed_refresh_token String?
+  is_creator           Boolean @default(false)
+  is_active            Boolean @default(true)
+
+  @@map("admins")
+}
+
+model Post {
+  id        BigInt @id @default(autoincrement())
+  title     String
+  image_url String
+  // contents  Content[]
+}
+
+model Video {
+  id            BigInt @id @default(autoincrement())
+  title         String
+  description   String
+  video_url     String
+  thumbnail_url String
+  duration      String
+  // contents      Content[]
+  // watchHistory  Watch_History[]
+  // savedBy       Saved_Video[]
+  // playlistItems Playlist_Video[]
+}
+
+model Content {
+  id           BigInt      @id @default(autoincrement())
+  userId       BigInt
+  content_type ContentType
+  contentId    BigInt
+  link         String? @default(uuid()) @unique
+  views        Int         @default(0)
+  created_at   DateTime    @default(now())
+
+  // comments Comment[]
+  // likes    Like[]
+  // notifications Notification[]
+  // reports  Report[]
+}
+
+model Comment {
+  id        BigInt   @id @default(autoincrement())
+  userId    BigInt
+  contentId BigInt
+  text      String
+  texted_at DateTime @default(now())
+}
+
+model Like {
+  id           BigInt      @id @default(autoincrement())
+  userId       BigInt
+  content_type ContentType
+  contentId    BigInt
+  is_like      Boolean
+}
+
+model Watch_History {
+  id             BigInt   @id @default(autoincrement())
+  userId         BigInt
+  videoId        BigInt
+  watched_at     DateTime @default(now())
+  watch_duration String
+}
+
+model Saved_Video {
+  id       BigInt   @id @default(autoincrement())
+  userId   BigInt
+  videoId  BigInt
+  saved_at DateTime @default(now())
+}
+
+model Playlist {
+  id          BigInt   @id @default(autoincrement())
+  userId      BigInt
+  name        String
+  description String?
+  created_at  DateTime @default(now())
+  // videos     Playlist_Video[]
+}
+
+model Playlist_Video {
+  id         BigInt @id @default(autoincrement())
+  playlistId BigInt
+  videoId    BigInt
+  position   Int
+}
+
+model Notification {
+  id                BigInt  @id @default(autoincrement())
+  toUserId          BigInt
+  fromUserId        BigInt
+  notification_text String
+  contentId         BigInt?
+  is_read           Boolean @default(false)
+}
+
+model Follower {
+  id          BigInt @id @default(autoincrement())
+  followerId  BigInt
+  followingId BigInt
+}
+
+model Report {
+  id           BigInt       @id @default(autoincrement())
+  reportedById BigInt
+  content_type ContentType
+  contentId    BigInt
+  reason       String
+  reported_at  DateTime     @default(now())
+  status       ReportStatus
+}
+
+model Banned_User {
+  id         BigInt    @id @default(autoincrement())
+  userId     BigInt
+  reason     String
+  banned_at  DateTime  @default(now())
+  expires_at DateTime?
+  bannedById BigInt
+}
+
+enum ContentType {
+  POST
+  VIDEO
+}
+
+enum ReportStatus {
+  PENDING
+  REVIEWED
+  BLOCKED
+  DISMISSED
+}

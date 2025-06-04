@@ -21,6 +21,7 @@ import { CreateBannedUserDto } from "./dto/create-banned_user.dto";
 import { UpdateBannedUserDto } from "./dto/update-banned_user.dto";
 import { RolesGuard } from "../common/guards/roles.guard";
 import { AdminLevel } from "../common/decorators/admin-level.decorator";
+import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 
 @ApiTags("banned-users")
 @Controller("banned-users")
@@ -37,7 +38,7 @@ export class BannedUsersController {
     return this.bannedUsersService.create(createBannedUserDto);
   }
 
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @AdminLevel("admin")
   @Get()
   @ApiOperation({ summary: "Get all banned users" })
@@ -46,7 +47,7 @@ export class BannedUsersController {
     return this.bannedUsersService.findAll();
   }
 
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @AdminLevel("admin")
   @Get(":id")
   @ApiOperation({ summary: "Get banned user by id" })
@@ -57,7 +58,7 @@ export class BannedUsersController {
     return this.bannedUsersService.findOne(id);
   }
 
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @AdminLevel("admin")
   @Patch(":id")
   @ApiOperation({ summary: "Update banned user by id" })
@@ -72,7 +73,7 @@ export class BannedUsersController {
     return this.bannedUsersService.update(id, updateBannedUserDto);
   }
 
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @AdminLevel("admin")
   @Delete(":id")
   @ApiOperation({ summary: "Delete banned user by id" })

@@ -3,11 +3,18 @@ import { AppModule } from "./app.module";
 import * as cookieParser from "cookie-parser";
 import { BadRequestException, ValidationPipe } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { WinstonModule } from "nest-winston";
+import { winstonConfig } from "./common/logger/winston-logger";
+import { AllExceptionsFilter } from "./common/errors/error.handling";
 
 async function start() {
   try {
     const PORT = process.env.PORT || 3001;
-    const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create(AppModule, {
+      logger: WinstonModule.createLogger(winstonConfig),
+    });
+    app.useGlobalFilters(new AllExceptionsFilter());
+
     app.use(cookieParser());
     app.useGlobalPipes(
       new ValidationPipe({

@@ -16,7 +16,7 @@ import { RolesGuard } from "../common/guards/roles.guard";
 import { JwtSelfGuard } from "../common/guards/jwt-self.guard";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 
-@ApiTags("Users") // Swagger'da kategoriya nomi
+@ApiTags("Users")
 @Controller("users")
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -31,7 +31,7 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @AdminLevel("admin")
   @Get()
   @ApiOperation({ summary: "Barcha foydalanuvchilarni olish" })

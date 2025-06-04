@@ -9,6 +9,7 @@ export class RolesGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const req = context.switchToHttp().getRequest();
     const user = req.user;
+  
 
     const level = this.reflector.getAllAndOverride<'super' | 'admin'>(
       ADMIN_LEVEL_KEY,
@@ -20,6 +21,7 @@ export class RolesGuard implements CanActivate {
     }
 
     if (!user || typeof user.is_creator !== 'boolean') {
+      
       throw new ForbiddenException('Foydalanuvchi aniqlanmadi yoki noto‘g‘ri');
     }
 

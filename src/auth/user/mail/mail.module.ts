@@ -20,7 +20,7 @@ import {HandlebarsAdapter}  from "@nestjs-modules/mailer/dist/adapters/handlebar
         }
       },
       defaults:{
-        from:`"Clinic" <${config.get<string>("SMTP_HOST")}>`
+        from:`"Vidora" <${config.get<string>("SMTP_HOST")}>`
       },
       template:{
         dir:join(__dirname, "templates"),

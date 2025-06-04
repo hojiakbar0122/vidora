@@ -1,4 +1,15 @@
+import { ApiProperty } from '@nestjs/swagger';
+
 export class SignInDto {
-    readonly email:string
-    readonly password:string
+  @ApiProperty({
+    example: 'admin@example.com',
+    description: 'Adminning elektron pochtasi',
+  })
+  readonly email: string;
+
+  @ApiProperty({
+    example: 'strongPassword123',
+    description: 'Admin paroli',
+  })
+  readonly password: string;
 }

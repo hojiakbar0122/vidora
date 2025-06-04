@@ -27,20 +27,18 @@ model User {
   is_active            Boolean? @default(false)
   activation_link      String?  @unique @default(uuid())
 
-  // posts        Post[]
-  // videos       Video[]
-  // comments     Comment[]
-  // likes        Like[]
-  // watchHistory Watch_History[]
-  // savedVideos  Saved_Video[]
-  // playlists    Playlist[]
-  // notifications Notification[] @relation("ToUser")
-  // notificationsSent Notification[] @relation("FromUser")
-  // followers    Follower[]      @relation("Following")
-  // following    Follower[]      @relation("Follower")
-  // reports      Report[]        @relation("ReportedBy")
-  // bans         Banned_User[]   @relation("BannedBy")
-  // contents     Content[]
+  videos        Video[]
+  comments      Comment[]
+  likes         Like[]
+  watchHistory  Watch_History[]
+  savedVideos   Saved_Video[]
+  playlists     Playlist[]
+  notifications Notification[]
+  followers     Follower[]      @relation("UserFollower")
+  followings    Follower[]      @relation("UserFollowing")
+  reports       Report[]
+  bannedUsers         Banned_User[] @relation("BannedUsers")
+  bannedBy         Banned_User[]  @relation("BannedBy")
 
   @@map("users")
 }
@@ -60,125 +58,134 @@ model Admin {
   @@map("admins")
 }
 
-model Post {
-  id        BigInt @id @default(autoincrement())
-  title     String
-  image_url String
-  // contents  Content[]
-}
-
 model Video {
-  id            BigInt @id @default(autoincrement())
+  id            Int      @id @default(autoincrement())
   title         String
   description   String
   video_url     String
   thumbnail_url String
   duration      String
-  // contents      Content[]
-  // watchHistory  Watch_History[]
-  // savedBy       Saved_Video[]
-  // playlistItems Playlist_Video[]
-}
+  views         Int      @default(0)
+  created_at    DateTime @default(now())
 
-model Content {
-  id           BigInt      @id @default(autoincrement())
-  userId       BigInt
-  content_type ContentType
-  contentId    BigInt
-  link         String? @default(uuid()) @unique
-  views        Int         @default(0)
-  created_at   DateTime    @default(now())
-
-  // comments Comment[]
-  // likes    Like[]
-  // notifications Notification[]
-  // reports  Report[]
+  userId        Int
+  user          User             @relation(fields: [userId], references: [id])
+  comments      Comment[]
+  likes         Like[]
+  watchHistory  Watch_History[]
+  notifications Notification[]
+  savedVideos   Saved_Video[]
+  playlistItems Playlist_Video[]
+  reports       Report[]
 }
 
 model Comment {
-  id        BigInt   @id @default(autoincrement())
-  userId    BigInt
-  contentId BigInt
-  text      String
+  id        Int      @id @default(autoincrement())
+  text      String?
   texted_at DateTime @default(now())
+
+  userId  Int
+  user    User  @relation(fields: [userId], references: [id])
+  videoId Int
+  video   Video @relation(fields: [videoId], references: [id])
 }
 
 model Like {
-  id           BigInt      @id @default(autoincrement())
-  userId       BigInt
-  content_type ContentType
-  contentId    BigInt
-  is_like      Boolean
+  id      Int @id @default(autoincrement())
+  is_like Int @default(0)
+
+  userId  Int
+  user    User  @relation(fields: [userId], references: [id])
+  videoId Int
+  video   Video @relation(fields: [videoId], references: [id])
 }
 
 model Watch_History {
-  id             BigInt   @id @default(autoincrement())
-  userId         BigInt
-  videoId        BigInt
+  id             Int      @id @default(autoincrement())
   watched_at     DateTime @default(now())
   watch_duration String
+
+  userId  Int
+  user    User  @relation(fields: [userId], references: [id])
+  videoId Int
+  video   Video @relation(fields: [videoId], references: [id])
 }
 
 model Saved_Video {
-  id       BigInt   @id @default(autoincrement())
-  userId   BigInt
-  videoId  BigInt
+  id       Int      @id @default(autoincrement())
+  userId   Int
+  videoId  Int
   saved_at DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id])
+  video Video @relation(fields: [videoId], references: [id])
 }
 
 model Playlist {
-  id          BigInt   @id @default(autoincrement())
-  userId      BigInt
-  name        String
-  description String?
-  created_at  DateTime @default(now())
-  // videos     Playlist_Video[]
+  id              Int              @id @default(autoincrement())
+  userId          Int
+  name            String
+  description     String?
+  created_at      DateTime         @default(now())
+  playlist_videos Playlist_Video[]
+
+  user User @relation(fields: [userId], references: [id])
 }
 
 model Playlist_Video {
-  id         BigInt @id @default(autoincrement())
-  playlistId BigInt
-  videoId    BigInt
-  position   Int
+  id         Int @id @default(autoincrement())
+  playlistId Int
+  videoId    Int
+  position   Int @default(0)
+
+  playlist Playlist @relation(fields: [playlistId], references: [id])
+  video    Video    @relation(fields: [videoId], references: [id])
 }
 
 model Notification {
-  id                BigInt  @id @default(autoincrement())
-  toUserId          BigInt
-  fromUserId        BigInt
-  notification_text String
-  contentId         BigInt?
-  is_read           Boolean @default(false)
+  id        Int      @id @default(autoincrement())
+  message   String
+  is_read   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user    User   @relation(fields: [userId], references: [id])
+  userId  Int
+  video   Video? @relation(fields: [videoId], references: [id])
+  videoId Int? // optional bo'lishi mumkin
 }
 
 model Follower {
-  id          BigInt @id @default(autoincrement())
-  followerId  BigInt
-  followingId BigInt
+  id          Int      @id @default(autoincrement())
+  followerId  Int
+  followingId Int
+  createdAt   DateTime @default(now())
+
+  follower  User @relation("UserFollower", fields: [followerId], references: [id])
+  following User @relation("UserFollowing", fields: [followingId], references: [id])
 }
 
 model Report {
-  id           BigInt       @id @default(autoincrement())
-  reportedById BigInt
-  content_type ContentType
-  contentId    BigInt
-  reason       String
-  reported_at  DateTime     @default(now())
-  status       ReportStatus
+  id          Int          @id @default(autoincrement())
+  reportedBy  Int
+  videoId     Int
+  reason      String
+  reported_at DateTime     @default(now())
+  status      ReportStatus
+
+  reporter User  @relation(fields: [reportedBy], references: [id])
+  video    Video @relation(fields: [videoId], references: [id])
 }
 
 model Banned_User {
-  id         BigInt    @id @default(autoincrement())
-  userId     BigInt
+  id         Int       @id @default(autoincrement())
+  userId     Int
   reason     String
   banned_at  DateTime  @default(now())
   expires_at DateTime?
-  bannedById BigInt
-}
+  bannedBy Int
 
-enum ContentType {
-  POST
-  VIDEO
+  user User  @relation("BannedUsers", fields: [userId], references: [id])
+  admin User  @relation("BannedBy", fields: [bannedBy], references: [id])
 }
 
 enum ReportStatus {

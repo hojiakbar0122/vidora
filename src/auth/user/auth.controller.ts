@@ -13,11 +13,14 @@ import { UserAuthService } from "./auth.service";
 import { CreateUserDto } from "../../users/dto";
 import { SignInDto } from "../dto/sign-in.dto";
 import { CookieGetter } from "../../common/decorators/cookie-getter.decorator";
+import { ApiTags, ApiOperation } from "@nestjs/swagger";
 
+@ApiTags("User Authentication")
 @Controller("user-auth")
 export class UserAuthController {
   constructor(private readonly authService: UserAuthService) {}
 
+  @ApiOperation({ summary: "Foydalanuvchini ro'yxatdan o'tkazish" })
   @Post("sign-up")
   async signUp(
     @Body() createUserDto: CreateUserDto,
@@ -26,6 +29,7 @@ export class UserAuthController {
     return this.authService.signUp(createUserDto, res);
   }
 
+  @ApiOperation({ summary: "Foydalanuvchini tizimga kirish (login)" })
   @HttpCode(200)
   @Post("sign-in")
   async signIn(
@@ -35,6 +39,7 @@ export class UserAuthController {
     return this.authService.signIn(signInUserDto, res);
   }
 
+  @ApiOperation({ summary: "Foydalanuvchini tizimdan chiqish (logout)" })
   @HttpCode(200)
   @Post("sign-out")
   signOut(
@@ -44,6 +49,7 @@ export class UserAuthController {
     return this.authService.signOut(refreshToken, res);
   }
 
+  @ApiOperation({ summary: "Tokenni yangilash (refresh token)" })
   @HttpCode(200)
   @Post(":id/refresh")
   refresh(
@@ -54,6 +60,7 @@ export class UserAuthController {
     return this.authService.refreshToken(id, refreshToken, res);
   }
 
+  @ApiOperation({ summary: "Foydalanuvchini aktivlashtirish" })
   @Get("activate/:link")
   activateUser(@Param("link") link: string) {
     return this.authService.activateUser(link);

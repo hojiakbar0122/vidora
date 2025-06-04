@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateUserDto, UpdateUserDto } from "./dto";
 import * as bcrypt from "bcrypt";
@@ -23,8 +27,21 @@ export class UsersService {
     return this.prismaService.user.findMany();
   }
 
-  findOne(id: number) {
-    return this.prismaService.user.findUnique({ where: { id } });
+  async findOne(id: number) {
+    const user = await this.prismaService.user.findUnique({
+      where: { id },
+      include: {
+        videos: true,
+        followers: true,
+        followings: true,
+        playlists:true,
+        savedVideos:true
+      },
+    });
+
+    if (!user) throw new NotFoundException("User topilmadi");
+
+    return user;
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
@@ -35,6 +52,6 @@ export class UsersService {
   }
 
   remove(id: number) {
-    return this.prismaService.user.delete({where:{id}});
+    return this.prismaService.user.delete({ where: { id } });
   }
 }

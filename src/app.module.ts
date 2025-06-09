@@ -15,6 +15,7 @@ import { PlaylistModule } from './playlist/playlist.module';
 import { SavedVideosModule } from './saved_videos/saved_videos.module';
 import { ReportsModule } from './reports/reports.module';
 import { BannedUsersModule } from './banned_users/banned_users.module';
+import { CategoryModule } from './category/category.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { BannedUsersModule } from './banned_users/banned_users.module';
     SavedVideosModule,
     ReportsModule,
     BannedUsersModule,
+    CategoryModule,
   ],
   controllers: [],
   providers: [],

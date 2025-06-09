@@ -27,6 +27,7 @@ import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 export class VideoController {
   constructor(private readonly videoService: VideoService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   @ApiOperation({ summary: "Create a new video" })
   @ApiBody({ type: CreateVideoDto })
@@ -35,6 +36,7 @@ export class VideoController {
     return this.videoService.create(createVideoDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   @ApiOperation({ summary: "Get all videos" })
   @ApiResponse({ status: 200, description: "List of videos" })
@@ -42,6 +44,7 @@ export class VideoController {
     return this.videoService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(":id")
   @ApiOperation({ summary: "Get video by id" })
   @ApiParam({ name: "id", type: Number, description: "Video ID" })
@@ -51,6 +54,7 @@ export class VideoController {
     return this.videoService.findOne(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(":id")
   @ApiOperation({ summary: "Update video by id" })
   @ApiParam({ name: "id", type: Number, description: "Video ID" })
@@ -64,7 +68,6 @@ export class VideoController {
     return this.videoService.update(id, updateVideoDto);
   }
 
-  @UseGuards(JwtSelfGuard)
   @UseGuards(JwtAuthGuard)
   @Delete(":id")
   @ApiOperation({ summary: "Delete video by id" })
@@ -75,7 +78,6 @@ export class VideoController {
     return this.videoService.remove(id);
   }
 
-  @UseGuards(JwtSelfGuard)
   @UseGuards(JwtAuthGuard)
   @Get(":id/view")
   @ApiOperation({ summary: "Increment view count for video by id" })

@@ -112,14 +112,18 @@ export class AdminAuthService {
       throw new BadRequestException("Admin not found");
     }
 
+    console.log(refresh_token);
+    console.log(admin.hashed_refresh_token);
+    
     const tokenMatch = await bcrypt.compare(refresh_token, admin.hashed_refresh_token);
 
     if (!tokenMatch) {
-      throw new ForbiddenException("Forbidden");
+      throw new ForbiddenException("Forbidden1");
     }
 
     const { accessToken, refreshToken } = await this.generateTokens(admin);
-    await this.updateRefreshToken(admin.id, refresh_token);
+    const hashed_refresh_token = await bcrypt.hash(refreshToken, 7);
+    await this.updateRefreshToken(admin.id, hashed_refresh_token);
 
     res.cookie("refreshToken", refreshToken, {
       maxAge: Number(process.env.COOKIE_TIME),

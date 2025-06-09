@@ -28,7 +28,7 @@ import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 export class BannedUsersController {
   constructor(private readonly bannedUsersService: BannedUsersService) {}
 
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @AdminLevel("admin")
   @Post()
   @ApiOperation({ summary: "Create a new banned user record" })

@@ -1,11 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsNotEmpty,
-  IsString,
-  IsUrl,
-  Matches,
-  IsInt,
-} from 'class-validator';
+import { ApiProperty } from "@nestjs/swagger";
+import { IsNotEmpty, IsString, IsUrl, Matches, IsInt } from "class-validator";
 
 export class CreateVideoDto {
   @ApiProperty({
@@ -25,7 +19,8 @@ export class CreateVideoDto {
   title: string;
 
   @ApiProperty({
-    example: "Ushbu video tog'lar, daryolar va o'rmonlar manzaralarini o'z ichiga oladi.",
+    example:
+      "Ushbu video tog'lar, daryolar va o'rmonlar manzaralarini o'z ichiga oladi.",
     description: "Video tavsifi",
   })
   @IsNotEmpty()
@@ -54,7 +49,16 @@ export class CreateVideoDto {
   })
   @IsNotEmpty()
   @Matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/, {
-    message: "Davomiylik soat:dakika:soniya formatida bo‘lishi kerak (HH:MM:SS)",
+    message:
+      "Davomiylik soat:dakika:soniya formatida bo‘lishi kerak (HH:MM:SS)",
   })
   duration: string;
+
+  @ApiProperty({
+    example: 2,
+    description: "Video kategoriyasi IDsi",
+  })
+  @IsNotEmpty()
+  @IsInt()
+  categoryId: number;
 }

@@ -37,8 +37,8 @@ model User {
   followers     Follower[]      @relation("UserFollower")
   followings    Follower[]      @relation("UserFollowing")
   reports       Report[]
-  bannedUsers         Banned_User[] @relation("BannedUsers")
-  bannedBy         Banned_User[]  @relation("BannedBy")
+  bannedUsers   Banned_User[]   @relation("BannedUsers")
+  bannedBy      Banned_User[]   @relation("BannedBy")
 
   @@map("users")
 }
@@ -71,12 +71,20 @@ model Video {
   userId        Int
   user          User             @relation(fields: [userId], references: [id])
   comments      Comment[]
+  category      Category        @relation(fields: [categoryId], references: [id])
+  categoryId    Int
   likes         Like[]
   watchHistory  Watch_History[]
   notifications Notification[]
   savedVideos   Saved_Video[]
   playlistItems Playlist_Video[]
   reports       Report[]
+}
+
+model Category {
+  id     Int     @id @default(autoincrement())
+  name   String  @unique
+  videos Video[]
 }
 
 model Comment {
@@ -182,10 +190,10 @@ model Banned_User {
   reason     String
   banned_at  DateTime  @default(now())
   expires_at DateTime?
-  bannedBy Int
+  bannedBy   Int
 
-  user User  @relation("BannedUsers", fields: [userId], references: [id])
-  admin User  @relation("BannedBy", fields: [bannedBy], references: [id])
+  user  User @relation("BannedUsers", fields: [userId], references: [id])
+  admin User @relation("BannedBy", fields: [bannedBy], references: [id])
 }
 
 enum ReportStatus {

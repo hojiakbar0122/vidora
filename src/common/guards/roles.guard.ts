@@ -17,7 +17,7 @@ export class RolesGuard implements CanActivate {
     );
 
     if (!level) {
-      return true; // Ruxsat darajasi belgilanmagan bo‘lsa, o'tkazamiz
+      return true; // Ruxsat darajasi belgilanmagan bo‘lsa, o'tkazami
     }
 
     if (!user || typeof user.is_creator !== 'boolean') {

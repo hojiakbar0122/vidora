@@ -48,11 +48,26 @@ async function start() {
       .setDescription("NestJs Api")
       .setVersion("1.0")
       .addTag("Swagger, Validation, Send email, Bot, Tokens,")
-      .addBearerAuth()
+      .addBearerAuth(
+        {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+          name: "Authorization",
+          description: 'JWT tokenni kiriting (misol uchun, "Bearer 👉🏻token👈🏻")',
+          in: "header",
+        },
+        "JWT-auth"
+      )
+      .addSecurityRequirements("JWT-auth")
       .build();
 
     const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup("docs", app, document);
+    SwaggerModule.setup("docs", app, document, {
+      swaggerOptions: {
+        persistAuthorization: true,
+      },
+    });
     await app.listen(PORT, () => {
       console.log(`Server started at: http://localhost:${PORT}`);
     });
